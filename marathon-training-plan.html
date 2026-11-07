@@ -1,0 +1,384 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sub-3:30 Marathon Plan</title>
+<style>
+  :root {
+    --bg: #fafaf7; --surface: #ffffff; --text: #1d1d1b; --muted: #6b6b66;
+    --line: #e4e3dd; --bar: #c2c2b6; --bar-light: #e4e3de; --accent: #2a6fd6;
+    --accent-soft: #e6eefb; --done: #eef5ea;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #161615; --surface: #1f1f1d; --text: #ecebe6; --muted: #a3a29b;
+      --line: #34332f; --bar: #6b6a63; --bar-light: #3c3b37; --accent: #5b95ee;
+      --accent-soft: #1e2a3d; --done: #1f2a1c;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--text);
+    font: 16px/1.55 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  }
+  main { max-width: 860px; margin: 0 auto; padding: 32px 16px 64px; }
+  h1 { font-size: 2rem; line-height: 1.2; margin: 0 0 4px; letter-spacing: -0.01em; }
+  h2 { font-size: 1.3rem; margin: 44px 0 12px; }
+  .meta { color: var(--muted); margin: 0 0 24px; }
+  .lead { font-size: 1.1rem; }
+  .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin: 24px 0; }
+  .stat { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; }
+  .stat b { display: block; font-size: 1.5rem; }
+  .stat span { color: var(--muted); font-size: 0.9rem; }
+  .card { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 16px; }
+  table { width: 100%; border-collapse: collapse; font-size: 0.95rem; }
+  th, td { text-align: left; padding: 9px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  th { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.04em; color: var(--muted); font-weight: 600; }
+  .table-wrap { overflow-x: auto; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; }
+  tr.phase-row td { background: var(--accent-soft); font-weight: 600; font-size: 0.85rem; }
+  tr.cut td:nth-child(4) { color: var(--muted); }
+  tr.past td { color: var(--muted); }
+  tr.checked td { background: var(--done); }
+  tr.race td { font-weight: 700; }
+  td.num { white-space: nowrap; font-variant-numeric: tabular-nums; }
+  input[type=checkbox] { width: 18px; height: 18px; accent-color: var(--accent); }
+  ul, ol { padding-left: 22px; }
+  li { margin: 6px 0; }
+  .note { color: var(--muted); font-size: 0.92rem; }
+  .checkpoint { border-left: 4px solid var(--accent); padding: 10px 14px; background: var(--accent-soft); border-radius: 0 8px 8px 0; margin-top: 16px; }
+  svg text { font-family: inherit; }
+  .home { display: inline-block; margin-bottom: 20px; color: var(--muted); text-decoration: none; font-size: 0.9rem; }
+  .home:hover { color: var(--accent); }
+  tr.week { cursor: pointer; }
+  tr.week:hover td { background: var(--accent-soft); }
+  tr.week.open td { border-bottom-color: transparent; }
+  .toggle { background: none; border: 0; padding: 0; font: inherit; color: inherit; cursor: pointer; display: inline-flex; gap: 6px; align-items: center; }
+  .chev { display: inline-block; width: 10px; font-size: 1.15rem; line-height: 1; transition: transform .15s; color: var(--muted); }
+  tr.open .chev { transform: rotate(90deg); }
+  .change .sub { display: block; font-size: 0.8rem; color: var(--muted); }
+  .change .sub.warn { color: #c2691e; }
+  .warn { color: #c2691e; font-weight: 600; }
+  .down { color: var(--muted); }
+  .muted { color: var(--muted); }
+  tr.detail td { padding: 0 10px 14px; background: var(--surface); }
+  .runs { border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
+  .run { display: grid; grid-template-columns: 64px 170px 56px 1fr; gap: 10px; padding: 8px 12px; border-top: 1px solid var(--line); font-size: 0.9rem; }
+  .run:first-child { border-top: 0; }
+  .run.head { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.04em; color: var(--muted); background: var(--bg); }
+  .run.total { background: var(--bg); font-weight: 600; }
+  .run.total .how { font-weight: 400; color: var(--muted); }
+  .run .type { font-weight: 600; }
+  .run.total .type { font-weight: 600; }
+  .btn { font: inherit; font-size: 0.9rem; padding: 7px 14px; border-radius: 8px; border: 1px solid var(--line); background: var(--surface); color: var(--text); cursor: pointer; }
+  @media (max-width: 600px) {
+    .run { grid-template-columns: 52px 1fr 44px; }
+    .run .how { grid-column: 1 / -1; color: var(--muted); }
+    .run.head .how, .run.head span:last-child { display: none; }
+  }
+  @media (max-width: 600px) {
+    h1 { font-size: 1.6rem; }
+    th, td { padding: 8px 6px; font-size: 0.88rem; }
+  }
+  @media print {
+    .table-wrap, .card { border: none; }
+    input[type=checkbox] { display: none; }
+  }
+</style>
+</head>
+<body>
+<main>
+  <a class="home" href="/">&larr; messerli.co</a>
+  <h1>Sub-3:30 Marathon Plan</h1>
+  <p class="meta">Race day: Saturday, May 15, 2027 · 27 weeks from November 9, 2026</p>
+
+  <p class="lead">Three easy runs a week through January 3 build your aerobic base. From January 4 you move to four runs a week, with workouts, peaking at 44 miles in April. Sub-3:30 means averaging 8:00 per mile.</p>
+
+  <div class="stats">
+    <div class="stat"><b>8:00</b><span>goal pace per mile</span></div>
+    <div class="stat"><b>44 mi</b><span>peak week</span></div>
+    <div class="stat"><b>3 × 20</b><span>20-mile long runs</span></div>
+    <div class="stat"><b>1:40</b><span>week 19 half checkpoint</span></div>
+  </div>
+
+  <h2>Weekly mileage</h2>
+  <div class="card"><svg id="chart" viewBox="0 0 760 340" role="img" aria-label="Weekly running miles build to a 44-mile peak" width="100%"></svg></div>
+  <p class="note">Blue bars are peak weeks and lighter bars are cutback weeks. Week 27 includes the race.</p>
+
+  <h2>The weekly pattern</h2>
+  <ul>
+    <li><b>Nov 9 – Jan 3, three runs:</b> two easy weekday runs (one with strides) and a weekend long run. No hard workouts, just aerobic base.</li>
+    <li><b>From Jan 4, four runs:</b> two easy runs, one workout (tempo, intervals or marathon pace) and the long run.</li>
+    <li><b>A sample week from January:</b> Tue easy, Thu workout, Fri easy, Sun long.</li>
+    <li><b>Spacing:</b> never run hard two days in a row, and leave at least two days between the workout and the long run.</li>
+  </ul>
+
+  <h2>Training paces</h2>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Effort</th><th>Pace / mile</th><th>Feels like</th></tr></thead>
+      <tbody>
+        <tr><td>Easy / long run</td><td class="num">9:00–9:45</td><td>Full sentences, could go all day</td></tr>
+        <tr><td>Marathon pace (MP)</td><td class="num">7:55–8:00</td><td>Steady and controlled; sub-3:30 needs 8:00</td></tr>
+        <tr><td>Tempo</td><td class="num">7:20–7:35</td><td>Comfortably hard, a few words at a time</td></tr>
+        <tr><td>Intervals</td><td class="num">6:55–7:10</td><td>Hard, about 5k race effort</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="note">Grow into these. Workouts start in January, so run them at the slower end of each range at first, or up to 20 seconds slower if they feel like a fight. Easy runs stay easy no matter what.</p>
+
+  <h2>The phases</h2>
+  <ol>
+    <li><b>Base, weeks 1–8 (Nov–Dec):</b> easy aerobic miles. The long run grows from 8 to 13 miles and the week from 16 to 24.</li>
+    <li><b>Build, weeks 9–16 (Jan–Feb):</b> the fourth run day and weekly workouts begin, and the long run reaches 18.</li>
+    <li><b>Peak, weeks 17–24 (Mar–Apr):</b> three 20-milers, a tune-up half marathon and up to 44 miles a week.</li>
+    <li><b>Taper, weeks 25–27 (late Apr–May):</b> volume drops so you arrive fresh.</li>
+  </ol>
+  <p class="note">Every fourth week or so is a lighter cutback week. Don't skip them; that's when your body absorbs the training.</p>
+
+  <h2>Weekly schedule</h2>
+  <p class="note">Tap a week to see each run on its own row, and tick it off when you finish; checkmarks are saved in this browser. Workout distances include the warm-up and cool-down.</p>
+  <p class="note"><b>Change</b> is the week-over-week mileage change. After a cutback week, the smaller line compares against the last full week, which is the real increase. <span class="warn">Orange</span> marks true increases over 10%.</p>
+  <p><button id="expandAll" class="btn">Expand all weeks</button></p>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th></th><th>Wk</th><th>Starts</th><th>Focus</th><th>Long run</th><th>Miles</th><th>Change</th></tr></thead>
+      <tbody id="schedule"></tbody>
+    </table>
+  </div>
+  <div class="checkpoint"><b>Week 19 checkpoint:</b> a half marathon of 1:40 or faster says sub-3:30 is on. If you run closer to 1:45–1:50, aim for 3:35–3:45 and keep the first half controlled.</div>
+
+  <h2>How to run each workout</h2>
+  <ul>
+    <li><b>Easy:</b> 9:00–9:45 pace. If you can't talk in full sentences, slow down.</li>
+    <li><b>Strides:</b> 4 × 20-second smooth accelerations to fast, not all-out, with a full walk back between.</li>
+    <li><b>Tempo:</b> warm up 1 mile, run the tempo miles at 7:20–7:35, cool down. For repeats (3 × 2 mi), jog 3 minutes between.</li>
+    <li><b>Intervals:</b> warm up 1–2 miles, run each rep at 6:55–7:10, jog half the rep's distance between, cool down.</li>
+    <li><b>Marathon pace (MP):</b> warm up 1 mile, then hold 7:55–8:00 evenly. These teach your body race rhythm and fueling.</li>
+    <li><b>Long run with MP finish:</b> run easy, then shift to MP for the last miles without straining.</li>
+    <li><b>Tune-up half (week 19):</b> race it hard. Find one near you, or run 13 with the middle 10 at MP.</li>
+  </ul>
+  <p><b>If you miss a run:</b> skip it and carry on with the plan. Never squeeze two hard runs into the same week to catch up.</p>
+
+  <h2>Making it work</h2>
+  <p>Cross-training and strength work fill the days you don't run.</p>
+  <ul>
+    <li><b>Cross-train 1–2 days a week:</b> 30–60 minutes of easy cycling, elliptical, rowing or swimming builds aerobic fitness without the pounding.</li>
+    <li><b>Strength twice a week:</b> 20 minutes of squats, lunges, calf raises, glute bridges and planks. This is the best protection against injury on long runs.</li>
+    <li><b>Keep easy runs easy:</b> they build the aerobic base, so most of your miles should feel relaxed, even when the goal pace feels far off.</li>
+    <li><b>Fuel the long runs:</b> from 14 miles on, take a gel or chews every 30–40 minutes. Practice with what the race will hand out.</li>
+    <li><b>Rest after long runs:</b> take the day after off or keep it very easy.</li>
+    <li><b>Shoes:</b> replace them every 300–500 miles. Start a fresh pair by late March so they're broken in by race day.</li>
+    <li><b>Back off for pain:</b> soreness that fades as you warm up is normal. Pain that gets worse or changes your stride means stop and rest 2–3 days; see a doctor or physio if it lasts.</li>
+  </ul>
+</main>
+
+<script>
+const weeks = [
+  [1,'Nov 9','Base','4 with strides · 4 easy','8 easy',16],
+  [2,'Nov 16','Base','4 with strides · 5 easy','9 easy',18],
+  [3,'Nov 23','Base','4 with strides · 5 easy','10 easy',19],
+  [4,'Nov 30','Base','Cutback: 4 easy · 4 easy','8 easy',16,'cut'],
+  [5,'Dec 7','Base','5 with strides · 5 easy','11 easy',21],
+  [6,'Dec 14','Base','5 with strides · 6 easy','12 easy',23],
+  [7,'Dec 21','Base','Cutback: 4 easy · 5 easy','9 easy',18,'cut'],
+  [8,'Dec 28','Base','5 with strides · 6 easy','13 easy',24],
+  [9,'Jan 4','Build','4 easy · 6 with 3 mi tempo · 4 easy','13 easy',27],
+  [10,'Jan 11','Build','4 easy · 7 with 5 × 1 km intervals · 5 easy','14 easy',30],
+  [11,'Jan 18','Build','5 easy · 7 with 4 mi tempo · 5 easy','15 easy',32],
+  [12,'Jan 25','Build','Cutback: 4 easy · 5 with strides · 4 easy','11 easy',24,'cut'],
+  [13,'Feb 1','Build','5 easy · 8 with 5 mi at MP · 5 easy','16 easy',34],
+  [14,'Feb 8','Build','5 easy · 8 with 3 × 2 mi tempo · 6 easy','17 easy',36],
+  [15,'Feb 15','Build','6 easy · 9 with 6 mi at MP · 6 easy','18, last 3 at MP',39],
+  [16,'Feb 22','Build','Cutback: 4 easy · 6 with 2 × 2 mi tempo · 5 easy','13 easy',28,'cut'],
+  [17,'Mar 1','Peak','6 easy · 9 with 6 × 1 km intervals · 6 easy','18 easy',39],
+  [18,'Mar 8','Peak','6 easy · 10 with 7 mi at MP · 6 easy','19 easy',41],
+  [19,'Mar 15','Peak','Cutback: 5 easy · 5 with strides','Half marathon tune-up race',23.1,'cut'],
+  [20,'Mar 22','Peak','6 easy · 10 with 8 mi at MP · 7 easy','20 easy',43],
+  [21,'Mar 29','Peak','6 easy · 9 with 3 × 2 mi tempo · 7 easy','16, middle 10 at MP',38,'light'],
+  [22,'Apr 5','Peak','6 easy · 11 with 9 mi at MP · 7 easy','20, last 3 at MP',44],
+  [23,'Apr 12','Peak','Cutback: 5 easy · 6 easy · 5 easy','14 easy',30,'cut'],
+  [24,'Apr 19','Peak','6 easy · 11 with 8 mi at MP · 7 easy','20 easy',44],
+  [25,'Apr 26','Taper','5 easy · 8 with 6 mi at MP · 5 easy','14 easy',32],
+  [26,'May 3','Taper','4 easy · 7 with 4 mi at MP · 4 easy','10 easy',25],
+  [27,'May 10','Taper','Mon 4 easy · Wed 4 with 2 mi at MP · Thu 3 with strides','Race day, Sat May 15',37.2,'race']
+];
+const phaseNotes = {
+  Base: 'Base · weeks 1–8 · easy aerobic miles',
+  Build: 'Build · weeks 9–16 · four runs a week, workouts begin',
+  Peak: 'Peak · weeks 17–24 · 20-milers and the tune-up half',
+  Taper: 'Taper · weeks 25–27 · arrive fresh'
+};
+
+// Saved checkmarks (per browser)
+let done = {};
+try { done = JSON.parse(localStorage.getItem('sub330-done-v2') || '{}') || {}; } catch (e) { done = {}; }
+function save() { try { localStorage.setItem('sub330-done-v2', JSON.stringify(done)); } catch (e) {} }
+
+// Schedule table
+const PACE = { easy: '9:00–9:45', mp: '7:55–8:00', tempo: '7:20–7:35', int: '6:55–7:10' };
+const fuel = d => (+d >= 14 ? ' Fuel every 30–40 min.' : '');
+function describe(raw, isLong) {
+  let t = raw.replace(/^Cutback:\s*/, '');
+  let day = null;
+  const dm = t.match(/^(Mon|Tue|Wed|Thu|Fri|Sat|Sun)\s+/);
+  if (dm) { day = dm[1]; t = t.slice(dm[0].length); }
+  const dist = (t.match(/^(\d+(?:\.\d+)?)/) || [])[1] || '';
+  let m;
+  if (/Half marathon/.test(t)) return { day, type: 'Tune-up half marathon', dist: '13.1', detail: 'Race it hard. 1:40 or faster says sub-3:30 is on track.' };
+  if (/Race day/.test(t)) return { day: 'Sat', type: 'Marathon', dist: '26.2', detail: 'Goal pace 8:00/mi for 3:30. Start controlled and fuel every 30–40 min.' };
+  if ((m = t.match(/(\d+) × (\d+) mi tempo/))) return { day, type: 'Tempo repeats', dist, detail: `1 mi warm-up · ${m[1]} × ${m[2]} mi at ${PACE.tempo}, 3 min jog between · cool down` };
+  if ((m = t.match(/(\d+) mi tempo/))) return { day, type: 'Tempo', dist, detail: `1 mi warm-up · ${m[1]} mi at ${PACE.tempo} · cool down` };
+  if ((m = t.match(/(\d+) × (\d+) km intervals/))) return { day, type: 'Intervals', dist, detail: `1–2 mi warm-up · ${m[1]} × ${m[2]} km at ${PACE.int}, jog half the distance between · cool down` };
+  if ((m = t.match(/last (\d+) at MP/))) return { day, type: 'Long run, MP finish', dist, detail: `Easy at ${PACE.easy}, then the last ${m[1]} mi at ${PACE.mp}.${fuel(dist)}` };
+  if ((m = t.match(/middle (\d+) at MP/))) return { day, type: 'Long run, MP middle', dist, detail: `2–3 mi easy · ${m[1]} mi at ${PACE.mp} · easy to finish.${fuel(dist)}` };
+  if ((m = t.match(/(\d+) mi at MP/))) return { day, type: 'Marathon pace', dist, detail: `1 mi warm-up · ${m[1]} mi at ${PACE.mp} · cool down` };
+  if (/strides/.test(t)) return { day, type: 'Easy + strides', dist, detail: `Easy at ${PACE.easy}, then 4 × 20 s strides with a walk back` };
+  return { day, type: isLong ? 'Long run' : 'Easy', dist, detail: `Easy at ${PACE.easy}.${isLong ? fuel(dist) : ''}` };
+}
+function runsFor(r) {
+  const [, , , weekday, long] = r;
+  const parts = weekday.split(' · ');
+  const days = parts.length === 3 ? ['Tue', 'Thu', 'Fri'] : ['Tue', 'Thu'];
+  const runs = parts.map((p, i) => { const d = describe(p, false); d.day = d.day || days[i]; return d; });
+  const l = describe(long, true);
+  l.day = l.day || (/Half/.test(long) ? 'Sat/Sun' : 'Sun');
+  runs.push(l);
+  return runs;
+}
+function focusFor(r, runs) {
+  if (r[6] === 'race') return 'Race week';
+  if (/Half/.test(r[4])) return 'Cutback + tune-up half';
+  if (r[6] === 'cut') return 'Cutback week';
+  const key = runs.slice(0, -1).find(x => !/^Easy/.test(x.type));
+  const phrase = r[3].split(' · ').find(p => /tempo|intervals|MP/.test(p));
+  return key && phrase ? phrase.replace(/^\d+ with /, '') : 'Easy base';
+}
+const pct = (a, b) => (a - b) / b * 100;
+const fmt = v => `${v > 0 ? '+' : v < 0 ? '−' : '±'}${Math.abs(v).toFixed(1)}%`;
+const isRef = r => r[6] !== 'cut' && r[6] !== 'light' && r[6] !== 'race';
+
+const tbody = document.getElementById('schedule');
+let lastPhase = '';
+const detailRows = [];
+weeks.forEach((r, i) => {
+  const [wk, start, phase, , long, mi, flag] = r;
+  if (phase !== lastPhase) {
+    const pr = document.createElement('tr');
+    pr.className = 'phase-row';
+    pr.innerHTML = `<td colspan="7">${phaseNotes[phase]}</td>`;
+    tbody.appendChild(pr);
+    lastPhase = phase;
+  }
+  const runs = runsFor(r);
+
+  // Week-over-week change
+  let change = '<span class="muted">—</span>';
+  if (i > 0 && flag !== 'race') {
+    const prev = weeks[i - 1];
+    const wow = pct(mi, prev[5]);
+    let refJ = -1;
+    for (let j = i - 1; j >= 0; j--) if (isRef(weeks[j])) { refJ = j; break; }
+    let build = wow, sub = '';
+    if (refJ >= 0 && refJ !== i - 1 && mi > prev[5]) {
+      build = pct(mi, weeks[refJ][5]);
+      sub = `vs wk ${weeks[refJ][0]}: ${fmt(build)}`;
+    }
+    const warn = flag !== 'cut' && build > 10;
+    change = sub
+      ? `<span class="muted">${fmt(wow)}</span><span class="sub${warn ? ' warn' : ''}">${sub}</span>`
+      : `<span class="${wow < 0 ? 'down' : warn ? 'warn' : ''}">${fmt(wow)}</span>`;
+  } else if (flag === 'race') {
+    change = '<span class="muted">race week</span>';
+  }
+
+  const tr = document.createElement('tr');
+  tr.className = 'week';
+  if (flag === 'cut') tr.classList.add('cut');
+  if (flag === 'race') tr.classList.add('race');
+  if (done[wk]) tr.classList.add('checked');
+  tr.innerHTML = `<td><input type="checkbox" aria-label="Week ${wk} done" ${done[wk] ? 'checked' : ''}></td>
+    <td class="num"><button class="toggle" aria-expanded="false" aria-label="Show week ${wk} runs"><span class="chev">›</span>${wk}</button></td>
+    <td class="num">${start}</td><td>${focusFor(r, runs)}</td><td>${long}</td><td class="num">${mi}</td><td class="num change">${change}</td>`;
+
+  const dr = document.createElement('tr');
+  dr.className = 'detail';
+  dr.hidden = true;
+  dr.innerHTML = `<td colspan="7"><div class="runs">
+    <div class="run head"><span>Day</span><span>Run</span><span>Miles</span><span>How</span></div>
+    ${runs.map(x => `<div class="run"><span class="day">${x.day}</span><span class="type">${x.type}</span><span class="num">${x.dist}</span><span class="how">${x.detail}</span></div>`).join('')}
+    <div class="run total"><span></span><span>Week total</span><span class="num">${mi}</span><span class="how">${flag === 'race' ? 'Includes the 26.2-mile race' : 'Days are suggestions; keep the workout and long run 2+ days apart'}</span></div>
+  </div></td>`;
+
+  const btn = tr.querySelector('.toggle');
+  const setOpen = open => { dr.hidden = !open; btn.setAttribute('aria-expanded', open); tr.classList.toggle('open', open); };
+  tr.addEventListener('click', e => { if (e.target.closest('input')) return; setOpen(dr.hidden); });
+  detailRows.push(setOpen);
+
+  tr.querySelector('input').addEventListener('change', e => {
+    done[wk] = e.target.checked;
+    tr.classList.toggle('checked', e.target.checked);
+    save();
+  });
+  tbody.appendChild(tr);
+  tbody.appendChild(dr);
+});
+let allOpen = false;
+document.getElementById('expandAll').addEventListener('click', e => {
+  allOpen = !allOpen;
+  detailRows.forEach(f => f(allOpen));
+  e.target.textContent = allOpen ? 'Collapse all weeks' : 'Expand all weeks';
+});
+
+// Mileage chart
+const svg = document.getElementById('chart');
+const NS = 'http://www.w3.org/2000/svg';
+const left = 40, y0 = 30, base = 270, w = 710, max = 50;
+const band = w / weeks.length;
+const x = i => left + i * band;
+const y = v => base - v / max * (base - y0);
+const peak = Math.max(...weeks.filter(r => r[6] !== 'race').map(r => r[5]));
+function el(tag, attrs, text) {
+  const n = document.createElementNS(NS, tag);
+  for (const k in attrs) n.setAttribute(k, attrs[k]);
+  if (text !== undefined) n.textContent = text;
+  svg.appendChild(n);
+  return n;
+}
+const css = getComputedStyle(document.documentElement);
+const c = name => css.getPropertyValue(name).trim();
+[10, 20, 30, 40].forEach(g => {
+  el('line', { x1: left, x2: left + w, y1: y(g), y2: y(g), stroke: c('--line') });
+  el('text', { x: left - 8, y: y(g) + 4, 'text-anchor': 'end', 'font-size': 12, fill: c('--muted') }, g);
+});
+el('line', { x1: left, x2: left + w, y1: base, y2: base, stroke: c('--muted') });
+const sw = weeks.findIndex(r => r[0] === 9);
+el('line', { x1: x(sw), x2: x(sw), y1: y0 - 10, y2: base, stroke: c('--muted'), 'stroke-dasharray': '4 3' });
+el('text', { x: x(sw) + 6, y: y0, 'font-size': 12, fill: c('--muted') }, '4 runs a week from Jan 4');
+weeks.forEach((r, i) => {
+  const [wk, , , , , mi, flag] = r;
+  const hi = flag !== 'race' && mi === peak;
+  const rect = el('rect', {
+    x: x(i) + band * 0.15, y: y(mi), width: band * 0.7, height: base - y(mi), rx: 2,
+    fill: hi ? c('--accent') : (flag === 'cut' ? c('--bar-light') : c('--bar'))
+  });
+  const t = document.createElementNS(NS, 'title');
+  t.textContent = `Week ${wk}: ${mi} mi`;
+  rect.appendChild(t);
+  if (hi || i === 0) el('text', { x: x(i) + band / 2, y: y(mi) - 6, 'text-anchor': 'middle', 'font-size': 12, fill: c('--text') }, mi);
+  if (flag === 'race') el('text', { x: x(i) + band / 2, y: y(mi) - 6, 'text-anchor': 'middle', 'font-size': 12, fill: c('--text') }, 'Race');
+  if (i === 0 || wk % 5 === 0 || i === weeks.length - 1) el('text', { x: x(i) + band / 2, y: base + 16, 'text-anchor': 'middle', 'font-size': 12, fill: c('--muted') }, wk);
+});
+// Phase labels
+let start = 0;
+weeks.forEach((r, i) => {
+  const next = weeks[i + 1];
+  if (!next || next[2] !== r[2]) {
+    el('line', { x1: x(start) + 2, x2: x(i + 1) - 2, y1: base + 28, y2: base + 28, stroke: c('--muted') });
+    el('text', { x: (x(start) + x(i + 1)) / 2, y: base + 46, 'text-anchor': 'middle', 'font-size': 12, fill: c('--muted') }, r[2]);
+    start = i + 1;
+  }
+});
+</script>
+</body>
+</html>

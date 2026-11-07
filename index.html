@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>messerli.co</title>
+  <meta name="description" content="Personal projects by David Messerli.">
+  <style>
+    :root {
+      --bg: #f7f5f0;
+      --text: #1c1c1c;
+      --muted: #6b6b6b;
+      --accent: #c2410c;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #141414;
+        --text: #f0ede6;
+        --muted: #9a9a9a;
+        --accent: #fb923c;
+      }
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { height: 100%; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 2rem;
+    }
+    h1 {
+      font-family: Georgia, "Times New Roman", serif;
+      font-weight: 400;
+      font-size: clamp(3rem, 12vw, 7rem);
+      letter-spacing: -0.03em;
+      line-height: 1;
+    }
+    nav {
+      margin-top: 2.5rem;
+    }
+    nav a {
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 1rem;
+      letter-spacing: 0.04em;
+      padding-bottom: 2px;
+      border-bottom: 1px solid transparent;
+      transition: color 0.2s, border-color 0.2s;
+    }
+    nav a:hover,
+    nav a:focus-visible {
+      color: var(--accent);
+      border-bottom-color: var(--accent);
+      outline: none;
+    }
+  </style>
+</head>
+<body>
+  <h1>messerli.co</h1>
+  <nav>
+    <a href="marathon-training-plan.html">Marathon Training Plan &rarr;</a>
+  </nav>
+</body>
+</html>
