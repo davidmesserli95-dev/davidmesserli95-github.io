@@ -133,6 +133,32 @@
     }
     .races .note a { color: var(--muted); }
     .races .note a:hover { color: var(--accent); }
+    /* Joke note */
+    .sticky {
+      margin-top: 3rem;
+      max-width: 240px;
+      padding: 0.9rem 1rem 1rem;
+      background: #fff3a8;
+      color: #3a3520;
+      font-family: "Comic Sans MS", "Chalkboard SE", "Marker Felt", cursive;
+      font-size: 0.95rem;
+      line-height: 1.35;
+      text-align: left;
+      transform: rotate(-2deg);
+      box-shadow: 0 6px 14px rgba(0, 0, 0, 0.12);
+      border-radius: 2px;
+    }
+    .sticky .label {
+      display: block;
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      opacity: 0.6;
+      margin-bottom: 0.35rem;
+    }
+    @media (prefers-color-scheme: dark) {
+      .sticky { background: #e8d97a; color: #2a2614; box-shadow: 0 6px 14px rgba(0, 0, 0, 0.4); }
+    }
     @media (max-width: 420px) {
       .races td { padding: 0.55rem 0.6rem; }
       .races .dist { display: block; margin-left: 0; }
@@ -162,6 +188,11 @@
     </table>
     <p class="note">*Tortoise &amp; Hare staggered start, from about 8:00 AM. <a href="race-day.html">Full race details</a></p>
   </section>
+
+  <aside class="sticky">
+    <span class="label">Note to self</span>
+    How can I ban Brady from this site?
+  </aside>
 
   <script>
     // Hide races that have already happened and mark the next one.
