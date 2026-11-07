@@ -8,21 +8,26 @@
   <style>
     :root {
       --bg: #f7f5f0;
+      --surface: #ffffff;
       --text: #1c1c1c;
       --muted: #6b6b6b;
+      --line: #e4e2dc;
       --accent: #c2410c;
     }
     @media (prefers-color-scheme: dark) {
       :root {
         --bg: #141414;
+        --surface: #1d1d1c;
         --text: #f0ede6;
         --muted: #9a9a9a;
+        --line: #333230;
         --accent: #fb923c;
       }
     }
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    html, body { height: 100%; }
+    html, body { min-height: 100%; }
     body {
+      min-height: 100vh;
       background: var(--bg);
       color: var(--text);
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
@@ -31,7 +36,7 @@
       align-items: center;
       justify-content: center;
       text-align: center;
-      padding: 2rem;
+      padding: 3rem 1.25rem;
     }
     h1 {
       font-family: Georgia, "Times New Roman", serif;
@@ -42,7 +47,12 @@
     }
     nav {
       margin-top: 2.5rem;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 0.75rem 2rem;
     }
+    a { color: inherit; }
     nav a {
       color: var(--muted);
       text-decoration: none;
@@ -58,12 +68,124 @@
       border-bottom-color: var(--accent);
       outline: none;
     }
+
+    /* Upcoming races */
+    .races {
+      margin-top: 3.5rem;
+      width: 100%;
+      max-width: 520px;
+      text-align: left;
+    }
+    .races h2 {
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--muted);
+      margin-bottom: 0.6rem;
+      text-align: center;
+    }
+    .races table {
+      width: 100%;
+      border-collapse: collapse;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      overflow: hidden;
+      font-size: 0.92rem;
+    }
+    .races td {
+      padding: 0.6rem 0.85rem;
+      border-top: 1px solid var(--line);
+      vertical-align: baseline;
+    }
+    .races tr:first-child td { border-top: 0; }
+    .races td.date, .races td.time {
+      white-space: nowrap;
+      font-variant-numeric: tabular-nums;
+      color: var(--muted);
+    }
+    .races td.time { text-align: right; }
+    .races td.race a { text-decoration: none; }
+    .races td.race a:hover { color: var(--accent); }
+    .races .dist { color: var(--muted); font-size: 0.85em; margin-left: 0.35em; }
+    .races tr.next td { color: var(--text); }
+    .races tr.next td.race a { font-weight: 600; }
+    .races tr.goal td.race a { font-weight: 700; }
+    .tag {
+      display: inline-block;
+      font-size: 0.66rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--accent);
+      border: 1px solid var(--accent);
+      border-radius: 4px;
+      padding: 0 4px;
+      margin-left: 0.4em;
+      vertical-align: 1px;
+    }
+    .races .note {
+      margin-top: 0.6rem;
+      font-size: 0.8rem;
+      color: var(--muted);
+      text-align: center;
+    }
+    .races .note a { color: var(--muted); }
+    .races .note a:hover { color: var(--accent); }
+    @media (max-width: 420px) {
+      .races td { padding: 0.55rem 0.6rem; }
+      .races .dist { display: block; margin-left: 0; }
+    }
   </style>
 </head>
 <body>
   <h1>messerli.co</h1>
   <nav>
     <a href="marathon-training-plan.html">Marathon Training Plan &rarr;</a>
+    <a href="race-day.html">Race Day Info &rarr;</a>
   </nav>
+
+  <section class="races" id="races">
+    <h2>Upcoming races</h2>
+    <table>
+      <tbody>
+        <tr data-date="2026-11-26"><td class="date">Thu Nov 26</td><td class="race"><a href="race-day.html#turkey-trot">Turkey Trot</a><span class="dist">4 mi</span></td><td class="time">9:00 AM</td></tr>
+        <tr data-date="2026-12-06"><td class="date">Sun Dec 6</td><td class="race"><a href="race-day.html#spring-park">Spring Park</a><span class="dist">6K</span></td><td class="time">8:00 AM*</td></tr>
+        <tr data-date="2027-01-10"><td class="date">Sun Jan 10</td><td class="race"><a href="race-day.html#spring-canyon">Spring Canyon Park</a><span class="dist">5K</span></td><td class="time">8:00 AM*</td></tr>
+        <tr data-date="2027-02-07"><td class="date">Sun Feb 7</td><td class="race"><a href="race-day.html#edora">Edora Park</a><span class="dist">8K</span></td><td class="time">8:00 AM*</td></tr>
+        <tr data-date="2027-03-07"><td class="date">Sun Mar 7</td><td class="race"><a href="race-day.html#lee-martinez">Lee Martinez Park</a><span class="dist">10K</span></td><td class="time">8:00 AM*</td></tr>
+        <tr data-date="2027-04-04"><td class="date">Sun Apr 4</td><td class="race"><a href="race-day.html#cottonwood">Cottonwood Glen Park</a><span class="dist">12K</span></td><td class="time">8:00 AM*</td></tr>
+        <tr data-date="2027-04-18"><td class="date">Sun Apr 18</td><td class="race"><a href="race-day.html#horsetooth">Horsetooth Half</a><span class="dist">13.1 mi</span></td><td class="time">8:00 AM</td></tr>
+        <tr data-date="2027-05-16" class="goal"><td class="date">Sun May 16</td><td class="race"><a href="race-day.html#colfax">Colfax Marathon</a><span class="dist">26.2 mi</span><span class="tag">Goal</span></td><td class="time">6:00 AM</td></tr>
+      </tbody>
+    </table>
+    <p class="note">*Tortoise &amp; Hare staggered start, from about 8:00 AM. <a href="race-day.html">Full race details</a></p>
+  </section>
+
+  <script>
+    // Hide races that have already happened and mark the next one.
+    (function () {
+      var today = new Date(); today.setHours(0, 0, 0, 0);
+      var rows = document.querySelectorAll('#races tr[data-date]');
+      var shown = 0;
+      rows.forEach(function (row) {
+        var p = row.getAttribute('data-date').split('-');
+        var d = new Date(+p[0], +p[1] - 1, +p[2]);
+        if (d < today) { row.remove(); return; }
+        if (shown === 0) {
+          row.classList.add('next');
+          var days = Math.round((d - today) / 86400000);
+          var label = days === 0 ? 'Today' : days === 1 ? 'Tomorrow' : 'In ' + days + ' days';
+          var tag = document.createElement('span');
+          tag.className = 'tag';
+          tag.textContent = label;
+          row.querySelector('td.race').appendChild(tag);
+        }
+        shown++;
+      });
+      if (shown === 0) document.getElementById('races').remove();
+    })();
+  </script>
 </body>
 </html>
