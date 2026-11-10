@@ -73,6 +73,20 @@
   .race-tag { display: inline-block; font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; color: var(--accent); border: 1px solid var(--accent); border-radius: 4px; padding: 0 5px; margin-right: 6px; vertical-align: 1px; }
   .run.total .type { font-weight: 600; }
   .btn { font: inherit; font-size: 0.9rem; padding: 7px 14px; border-radius: 8px; border: 1px solid var(--line); background: var(--surface); color: var(--text); cursor: pointer; }
+  /* Actual runs from Garmin */
+  :root { --actual: #2f9e57; --short: #c2691e; }
+  @media (prefers-color-scheme: dark) { :root { --actual: #5cc38a; --short: #e3944f; } }
+  .progress { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin: -8px 0 24px; }
+  .progress .stat b { color: var(--actual); }
+  .progress-note { grid-column: 1 / -1; margin: -4px 0 0; }
+  td.actual .good { color: var(--actual); font-weight: 600; }
+  td.actual .short { color: var(--short); font-weight: 600; }
+  td.actual .sofar { display: block; font-size: 0.75rem; color: var(--muted); font-weight: 400; }
+  .logged { margin-top: 10px; }
+  .logged h4 { margin: 0 0 6px; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.04em; color: var(--actual); }
+  .logged .run.head { color: var(--actual); }
+  .logged .none { font-size: 0.88rem; color: var(--muted); margin: 0; }
+  .key { display: inline-block; width: 10px; height: 10px; border-radius: 2px; vertical-align: 0; margin: 0 4px 0 2px; }
   @media (max-width: 600px) {
     .run { grid-template-columns: 52px 1fr 44px; }
     .run .how { grid-column: 1 / -1; color: var(--muted); }
@@ -103,9 +117,11 @@
     <div class="stat"><b>~1:43</b><span>Horsetooth Half checkpoint</span></div>
   </div>
 
+  <div id="progress" class="progress" hidden></div>
+
   <h2>Weekly mileage</h2>
   <div class="card"><svg id="chart" viewBox="0 0 760 340" role="img" aria-label="Weekly running miles build to a 44-mile peak" width="100%"></svg></div>
-  <p class="note">Blue bars are peak weeks, lighter bars are cutback weeks, and dots mark race weeks. Week 27 includes the race.</p>
+  <p class="note">Blue bars are peak weeks, lighter bars are cutback weeks, and dots mark race weeks. Week 27 includes the race.<span id="actualKey" hidden> <span class="key" style="background: var(--actual)"></span>Green bars are miles actually run, from Garmin.</span></p>
 
   <h2>The weekly pattern</h2>
   <ul>
@@ -163,7 +179,7 @@
   <p><button id="expandAll" class="btn">Expand all weeks</button></p>
   <div class="table-wrap">
     <table>
-      <thead><tr><th></th><th>Wk</th><th>Starts</th><th>Focus</th><th>Long run</th><th>Miles</th><th>Change</th></tr></thead>
+      <thead><tr><th></th><th>Wk</th><th>Starts</th><th>Focus</th><th>Long run</th><th>Plan</th><th>Actual</th><th>Change</th></tr></thead>
       <tbody id="schedule"></tbody>
     </table>
   </div>
@@ -298,7 +314,7 @@ weeks.forEach((r, i) => {
   if (phase !== lastPhase) {
     const pr = document.createElement('tr');
     pr.className = 'phase-row';
-    pr.innerHTML = `<td colspan="7">${phaseNotes[phase]}</td>`;
+    pr.innerHTML = `<td colspan="8">${phaseNotes[phase]}</td>`;
     tbody.appendChild(pr);
     lastPhase = phase;
   }
@@ -331,16 +347,16 @@ weeks.forEach((r, i) => {
   if (done[wk]) tr.classList.add('checked');
   tr.innerHTML = `<td><input type="checkbox" aria-label="Week ${wk} done" ${done[wk] ? 'checked' : ''}></td>
     <td class="num"><button class="toggle" aria-expanded="false" aria-label="Show week ${wk} runs"><span class="chev">›</span>${wk}</button></td>
-    <td class="num">${start}</td><td>${focusFor(r, runs)}</td><td>${long}</td><td class="num">${mi}</td><td class="num change">${change}</td>`;
+    <td class="num">${start}</td><td>${focusFor(r, runs)}</td><td>${long}</td><td class="num">${mi}</td><td class="num actual" data-wk="${wk}"><span class="muted">–</span></td><td class="num change">${change}</td>`;
 
   const dr = document.createElement('tr');
   dr.className = 'detail';
   dr.hidden = true;
-  dr.innerHTML = `<td colspan="7"><div class="runs">
+  dr.innerHTML = `<td colspan="8"><div class="runs">
     <div class="run head"><span>Day</span><span>Run</span><span>Miles</span><span>How</span></div>
     ${runs.map(x => `<div class="run"><span class="day">${x.day}</span><span class="type">${x.type}</span><span class="num">${x.dist}</span><span class="how">${x.detail}</span></div>`).join('')}
     <div class="run total"><span></span><span>Week total</span><span class="num">${mi}</span><span class="how">${flag === 'race' ? 'Includes the 26.2-mile race' : 'Days are suggestions; keep the workout and long run 2+ days apart'}</span></div>
-  </div></td>`;
+  </div><div class="logged" data-wk="${wk}"></div></td>`;
 
   const btn = tr.querySelector('.toggle');
   const setOpen = open => { dr.hidden = !open; btn.setAttribute('aria-expanded', open); tr.classList.toggle('open', open); };
@@ -412,6 +428,89 @@ weeks.forEach((r, i) => {
     start = i + 1;
   }
 });
+// Actual runs from Garmin: data/runs.json is updated by a GitHub Action
+// (.github/workflows/sync-garmin.yml). If the file isn't there yet, the page
+// just shows the plan.
+const DAY = 86400000;
+const PLAN_START_UTC = Date.UTC(2026, 10, 9);
+const weekOf = iso => { const [y, m, d] = iso.split('-').map(Number); return Math.floor((Date.UTC(y, m - 1, d) - PLAN_START_UTC) / (7 * DAY)) + 1; };
+const todayIso = (() => { const t = new Date(); return `${t.getFullYear()}-${String(t.getMonth() + 1).padStart(2, '0')}-${String(t.getDate()).padStart(2, '0')}`; })();
+const mmss = s => { s = Math.round(s); return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`; };
+const hms = s => { s = Math.round(s); const h = Math.floor(s / 3600); return h ? `${h}:${String(Math.floor(s % 3600 / 60)).padStart(2, '0')}:${String(s % 60).padStart(2, '0')}` : mmss(s); };
+const runDay = iso => { const [y, m, d] = iso.split('-').map(Number); return new Date(y, m - 1, d).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' }); };
+const typeLabel = t => ({ running: 'Run', street_running: 'Run', treadmill_running: 'Treadmill', indoor_running: 'Indoor run', trail_running: 'Trail run', track_running: 'Track', virtual_run: 'Virtual run' }[t] || 'Run');
+const fmtMi = v => (Math.round(v * 10) / 10).toFixed(1);
+
+fetch('data/runs.json', { cache: 'no-cache' })
+  .then(r => (r.ok ? r.json() : null))
+  .then(data => { if (data && Array.isArray(data.runs)) showActual(data); })
+  .catch(() => {});
+
+function showActual(data) {
+  const current = weekOf(todayIso);
+  const byWeek = {};
+  data.runs.forEach(r => {
+    const wk = weekOf(r.date);
+    (byWeek[wk] = byWeek[wk] || { mi: 0, runs: [] });
+    byWeek[wk].mi += r.mi;
+    byWeek[wk].runs.push(r);
+  });
+  const planFor = wk => (weeks.find(w => w[0] === wk) || [])[5] || 0;
+
+  // Actual column
+  document.querySelectorAll('td.actual').forEach(td => {
+    const wk = +td.dataset.wk;
+    if (wk > current) return;
+    const mi = byWeek[wk] ? byWeek[wk].mi : 0;
+    if (wk === current) {
+      td.innerHTML = `${fmtMi(mi)}<span class="sofar">so far</span>`;
+    } else {
+      const ok = mi >= planFor(wk) * 0.9;
+      td.innerHTML = `<span class="${ok ? 'good' : 'short'}">${fmtMi(mi)}</span>`;
+    }
+  });
+
+  // Logged runs inside each week's details
+  document.querySelectorAll('.logged').forEach(div => {
+    const wk = +div.dataset.wk;
+    if (wk > current) return;
+    const w = byWeek[wk];
+    if (!w) { div.innerHTML = '<h4>Logged on Garmin</h4><p class="none">No runs logged this week yet.</p>'; return; }
+    div.innerHTML = `<h4>Logged on Garmin</h4><div class="runs">
+      <div class="run head"><span>Day</span><span>Run</span><span>Miles</span><span>Time · pace</span></div>
+      ${w.runs.map(r => `<div class="run"><span class="day">${runDay(r.date).split(',')[0]}</span><span class="type">${typeLabel(r.type)}</span><span class="num">${fmtMi(r.mi)}</span><span class="how">${r.sec ? `${hms(r.sec)} · ${mmss(r.sec / r.mi)}/mi` : ''}</span></div>`).join('')}
+      <div class="run total"><span></span><span>Logged total</span><span class="num">${fmtMi(w.mi)}</span><span class="how">of ${planFor(wk)} planned</span></div>
+    </div>`;
+  });
+
+  // Chart: green bars for actual miles
+  weeks.forEach((r, i) => {
+    const wk = r[0];
+    if (wk > current || !byWeek[wk]) return;
+    const mi = Math.min(byWeek[wk].mi, max);
+    const bar = el('rect', { x: x(i) + band * 0.32, y: y(mi), width: band * 0.36, height: base - y(mi), rx: 2, fill: c('--actual') });
+    const t = document.createElementNS(NS, 'title');
+    t.textContent = `Week ${wk}: ${fmtMi(byWeek[wk].mi)} mi run of ${r[5]} planned`;
+    bar.appendChild(t);
+  });
+  document.getElementById('actualKey').hidden = false;
+
+  // Progress summary
+  const inPlan = current >= 1 && current <= weeks.length;
+  const thisWeek = byWeek[current] ? byWeek[current].mi : 0;
+  let plannedToDate = 0, runToDate = 0;
+  weeks.forEach(w => { if (w[0] <= current) plannedToDate += w[5]; });
+  Object.keys(byWeek).forEach(k => { if (+k >= 1 && +k <= current) runToDate += byWeek[k].mi; });
+  const last = data.runs[data.runs.length - 1];
+  const updated = data.updated ? new Date(data.updated).toLocaleString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' }) : '';
+  const box = document.getElementById('progress');
+  box.innerHTML = (inPlan ? `<div class="stat"><b>${fmtMi(thisWeek)} mi</b><span>this week, of ${planFor(current)} planned (week ${current})</span></div>` : '') +
+    `<div class="stat"><b>${fmtMi(runToDate)} mi</b><span>run since Nov 9, of ${Math.round(plannedToDate * 10) / 10} planned through this week</span></div>` +
+    `<div class="stat"><b>${data.runs.length}</b><span>runs logged</span></div>` +
+    (last ? `<div class="stat"><b>${fmtMi(last.mi)} mi</b><span>last run, ${runDay(last.date)}${last.sec ? ` · ${mmss(last.sec / last.mi)}/mi` : ''}</span></div>` : '') +
+    `<p class="note progress-note">From Garmin${updated ? `, updated ${updated}` : ''}. Syncs twice a day.</p>`;
+  box.hidden = false;
+}
 </script>
 </body>
 </html>
