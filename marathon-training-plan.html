@@ -49,8 +49,6 @@
   .note { color: var(--muted); font-size: 0.92rem; }
   .checkpoint { border-left: 4px solid var(--accent); padding: 10px 14px; background: var(--accent-soft); border-radius: 0 8px 8px 0; margin-top: 16px; }
   svg text { font-family: inherit; }
-  .home { display: inline-block; margin-bottom: 20px; color: var(--muted); text-decoration: none; font-size: 0.9rem; }
-  .home:hover { color: var(--accent); }
   tr.week { cursor: pointer; }
   tr.week:hover td { background: var(--accent-soft); }
   tr.week.open td { border-bottom-color: transparent; }
@@ -73,20 +71,6 @@
   .race-tag { display: inline-block; font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; color: var(--accent); border: 1px solid var(--accent); border-radius: 4px; padding: 0 5px; margin-right: 6px; vertical-align: 1px; }
   .run.total .type { font-weight: 600; }
   .btn { font: inherit; font-size: 0.9rem; padding: 7px 14px; border-radius: 8px; border: 1px solid var(--line); background: var(--surface); color: var(--text); cursor: pointer; }
-  /* Actual runs from Garmin */
-  :root { --actual: #2f9e57; --short: #c2691e; }
-  @media (prefers-color-scheme: dark) { :root { --actual: #5cc38a; --short: #e3944f; } }
-  .progress { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin: -8px 0 24px; }
-  .progress .stat b { color: var(--actual); }
-  .progress-note { grid-column: 1 / -1; margin: -4px 0 0; }
-  td.actual .good { color: var(--actual); font-weight: 600; }
-  td.actual .short { color: var(--short); font-weight: 600; }
-  td.actual .sofar { display: block; font-size: 0.75rem; color: var(--muted); font-weight: 400; }
-  .logged { margin-top: 10px; }
-  .logged h4 { margin: 0 0 6px; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.04em; color: var(--actual); }
-  .logged .run.head { color: var(--actual); }
-  .logged .none { font-size: 0.88rem; color: var(--muted); margin: 0; }
-  .key { display: inline-block; width: 10px; height: 10px; border-radius: 2px; vertical-align: 0; margin: 0 4px 0 2px; }
   @media (max-width: 600px) {
     .run { grid-template-columns: 52px 1fr 44px; }
     .run .how { grid-column: 1 / -1; color: var(--muted); }
@@ -104,30 +88,28 @@
 </head>
 <body>
 <main>
-  <a class="home" href="/">&larr; messerli.co</a>
   <h1>Sub-3:30 Marathon Plan</h1>
   <p class="meta">Race day: Sunday, May 16, 2027 · 27 weeks from November 9, 2026</p>
 
-  <p class="lead">Three easy runs a week through January 3 build your aerobic base. From January 4 you move to four runs a week, with workouts, peaking at 44 miles in April. Seven races along the way double as tune-ups, and the Horsetooth Half on April 18 is the final checkpoint. Sub-3:30 means averaging 8:00 per mile.</p>
+  <p class="lead">Three easy runs a week through January 3 build your aerobic base. From January 4 you move to four runs a week with workouts, and from February 8 to five, peaking at 48 miles in April. Seven races along the way double as tune-ups, and the Horsetooth Half on April 18 is the final checkpoint. Sub-3:30 means averaging 8:00 per mile.</p>
 
   <div class="stats">
     <div class="stat"><b>8:00</b><span>goal pace per mile</span></div>
-    <div class="stat"><b>44 mi</b><span>peak week</span></div>
-    <div class="stat"><b>3 × 20</b><span>20-mile long runs</span></div>
-    <div class="stat"><b>~1:43</b><span>Horsetooth Half checkpoint</span></div>
+    <div class="stat"><b>48 mi</b><span>peak week</span></div>
+    <div class="stat"><b>2 × 20</b><span>20-milers, plus three 18s</span></div>
+    <div class="stat"><b>~1:42</b><span>Horsetooth Half checkpoint</span></div>
   </div>
 
-  <div id="progress" class="progress" hidden></div>
-
   <h2>Weekly mileage</h2>
-  <div class="card"><svg id="chart" viewBox="0 0 760 340" role="img" aria-label="Weekly running miles build to a 44-mile peak" width="100%"></svg></div>
-  <p class="note">Blue bars are peak weeks, lighter bars are cutback weeks, and dots mark race weeks. Week 27 includes the race.<span id="actualKey" hidden> <span class="key" style="background: var(--actual)"></span>Green bars are miles actually run, from Garmin.</span></p>
+  <div class="card"><svg id="chart" viewBox="0 0 760 340" role="img" aria-label="Weekly running miles build to a 48-mile peak" width="100%"></svg></div>
+  <p class="note">Blue bars are peak weeks, lighter bars are cutback weeks, and dots mark race weeks. Week 27 includes the race.</p>
 
   <h2>The weekly pattern</h2>
   <ul>
     <li><b>Nov 9 – Jan 3, three runs:</b> two easy weekday runs (one with strides) and a weekend long run. No hard workouts, just aerobic base.</li>
-    <li><b>From Jan 4, four runs:</b> two easy runs, one workout (tempo, intervals or marathon pace) and the long run.</li>
-    <li><b>A sample week from January:</b> Tue easy, Thu workout, Fri easy, Sun long.</li>
+    <li><b>Jan 4 – Feb 7, four runs:</b> Tue easy, Thu workout (tempo, intervals or marathon pace), Fri easy with strides, Sun long.</li>
+    <li><b>From Feb 8, five runs:</b> Tue easy, Wed workout, Thu easy, Fri easy with strides, Sun long. Mondays and Saturdays are rest days.</li>
+    <li><b>Hard days:</b> the workout and the long run. In weeks with marathon-pace miles in the long run, the midweek workout is lighter.</li>
     <li><b>Spacing:</b> never run hard two days in a row, and leave at least two days between the workout and the long run.</li>
   </ul>
 
@@ -148,8 +130,8 @@
   <h2>The phases</h2>
   <ol>
     <li><b>Base, weeks 1–8 (Nov–Dec):</b> easy aerobic miles. The long run grows from 8 to 13 miles and the week from 16 to 24.</li>
-    <li><b>Build, weeks 9–17 (Jan–early Mar):</b> the fourth run day and weekly workouts begin, and the long run reaches 18.</li>
-    <li><b>Peak, weeks 18–24 (Mar–Apr):</b> three 20-milers, the Horsetooth Half and up to 44 miles a week.</li>
+    <li><b>Build, weeks 9–17 (Jan–early Mar):</b> a fourth run day and weekly workouts begin, a fifth day arrives Feb 8, and long runs on hilly routes reach 17.</li>
+    <li><b>Peak, weeks 18–24 (Mar–Apr):</b> two 20-milers, marathon-pace finishes on tired legs, the Horsetooth Half and up to 48 miles a week. The last big run, 18 with 8 at MP, comes three weeks out.</li>
     <li><b>Taper, weeks 25–27 (late Apr–May):</b> volume drops so you arrive fresh.</li>
   </ol>
   <p class="note">Every fourth week or so is a lighter cutback week, timed to land on race weekends so you race on fresher legs. Don't skip them; that's when your body absorbs the training.</p>
@@ -171,6 +153,19 @@
       </tbody>
     </table>
   </div>
+  <p><b>Race checkpoints.</b> Times that line up with 3:30 marathon fitness. Don't worry about them in January, but you should be close by the 10K and 12K. Hilly or grassy courses, wind and cold run slower.</p>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Distance</th><th>3:30-equivalent time</th></tr></thead>
+      <tbody>
+        <tr><td>5K</td><td class="num">~21:50</td></tr>
+        <tr><td>8K</td><td class="num">~35:50</td></tr>
+        <tr><td>10K</td><td class="num">~45:15</td></tr>
+        <tr><td>12K</td><td class="num">~55:00</td></tr>
+        <tr><td>Half marathon (flat)</td><td class="num">~1:40 (about 1:42 at Horsetooth)</td></tr>
+      </tbody>
+    </table>
+  </div>
   <p class="note">Tortoise &amp; Hare dates are from the <a href="https://runsignup.com/MemberOrg/FortCollinsRunningClub/Page/TortoiseHare">Fort Collins Running Club schedule</a>. The races are free for members, and online registration closes at noon the Friday before each one.</p>
 
   <h2>Weekly schedule</h2>
@@ -179,11 +174,11 @@
   <p><button id="expandAll" class="btn">Expand all weeks</button></p>
   <div class="table-wrap">
     <table>
-      <thead><tr><th></th><th>Wk</th><th>Starts</th><th>Focus</th><th>Long run</th><th>Plan</th><th>Actual</th><th>Change</th></tr></thead>
+      <thead><tr><th></th><th>Wk</th><th>Starts</th><th>Focus</th><th>Long run</th><th>Miles</th><th>Change</th></tr></thead>
       <tbody id="schedule"></tbody>
     </table>
   </div>
-  <div class="checkpoint"><b>Horsetooth Half checkpoint (week 23):</b> Horsetooth climbs nearly 500 ft in the first 1.7 miles, so it runs a few minutes slower than a flat half. Roughly 1:43 or faster there says sub-3:30 is on. If you run closer to 1:48–1:53, aim for 3:35–3:45 and keep the first half controlled.</div>
+  <div class="checkpoint"><b>Horsetooth Half checkpoint (week 23):</b> Horsetooth climbs nearly 500 ft in the first 1.7 miles, so it runs a few minutes slower than a flat half. Sub-1:42 there (about 1:40 on a flat course) says 3:30 is possible with good execution. Around 1:43–1:46, aim for 3:32–3:38. Slower than last year's 1:46:13, aim for about 3:40. Whatever the target, run the first half controlled.</div>
 
   <h2>How to run each workout</h2>
   <ul>
@@ -192,7 +187,8 @@
     <li><b>Tempo:</b> warm up 1 mile, run the tempo miles at 7:20–7:35, cool down. For repeats (3 × 2 mi), jog 3 minutes between.</li>
     <li><b>Intervals:</b> warm up 1–2 miles, run each rep at 6:55–7:10, jog half the rep's distance between, cool down.</li>
     <li><b>Marathon pace (MP):</b> warm up 1 mile, then hold 7:55–8:00 evenly. These teach your body race rhythm and fueling.</li>
-    <li><b>Long run with MP finish:</b> run easy, then shift to MP for the last miles without straining.</li>
+    <li><b>Long run with MP finish:</b> run easy, then shift to MP for the last miles without straining. This is the most race-specific session in the plan, so wear race shoes and practice race fueling.</li>
+    <li><b>Long run, rolling hills:</b> pick a hilly route with real downhills (the foothills are ideal) to prepare for Horsetooth's climb and descents. Run by effort, not pace.</li>
     <li><b>Races:</b> race them hard; they replace the week's workout. Tap a race week for the warm-up and cool-down plan.</li>
   </ul>
   <p><b>If you miss a run:</b> skip it and carry on with the plan. Never squeeze two hard runs into the same week to catch up.</p>
@@ -201,7 +197,7 @@
   <p>Cross-training and strength work fill the days you don't run.</p>
   <ul>
     <li><b>Cross-train 1–2 days a week:</b> 30–60 minutes of easy cycling, elliptical, rowing or swimming builds aerobic fitness without the pounding.</li>
-    <li><b>Strength twice a week:</b> 20 minutes of squats, lunges, calf raises, glute bridges and planks. This is the best protection against injury on long runs.</li>
+    <li><b>Strength twice a week:</b> 20 minutes of calf raises, single-leg squats, lunges, glute bridges and planks, after an easy run or on a rest day. This is cheap insurance against injury on long runs.</li>
     <li><b>Keep easy runs easy:</b> they build the aerobic base, so most of your miles should feel relaxed, even when the goal pace feels far off.</li>
     <li><b>Fuel the long runs:</b> from 14 miles on, take a gel or chews every 30–40 minutes. Practice with what the race will hand out.</li>
     <li><b>Rest after long runs:</b> take the day after off or keep it very easy.</li>
@@ -221,23 +217,23 @@ const weeks = [
   [7,'Dec 21','Base','5 with strides · 6 easy','12 easy',23],
   [8,'Dec 28','Base','5 with strides · 6 easy','13 easy',24],
   [9,'Jan 4','Build','Cutback: 4 easy · 5 with strides · 4 easy','Spring Canyon Park 5K (8 total)',21,'cut'],
-  [10,'Jan 11','Build','4 easy · 6 with 3 mi tempo · 3 easy','13 easy',26],
-  [11,'Jan 18','Build','4 easy · 7 with 5 × 1 km intervals · 3 easy','14 easy',28],
-  [12,'Jan 25','Build','4 easy · 7 with 4 mi tempo · 4 easy','15 easy',30],
+  [10,'Jan 11','Build','4 easy · 6 with 3 mi tempo · 3 with strides','13 easy',26],
+  [11,'Jan 18','Build','4 easy · 7 with 5 × 1 km intervals · 3 with strides','14 easy',28],
+  [12,'Jan 25','Build','4 easy · 7 with 4 mi tempo · 4 with strides','15 easy',30],
   [13,'Feb 1','Build','Cutback: 4 easy · 5 with strides · 4 easy','Edora Park 8K (10 total)',23,'cut'],
-  [14,'Feb 8','Build','5 easy · 8 with 5 mi at MP · 4 easy','16 easy',33],
-  [15,'Feb 15','Build','5 easy · 8 with 3 × 2 mi tempo · 5 easy','17 easy',35],
-  [16,'Feb 22','Build','6 easy · 9 with 6 mi at MP · 5 easy','18, last 3 at MP',38],
-  [17,'Mar 1','Build','Cutback: 4 easy · 6 with strides · 4 easy','Lee Martinez Park 10K (12 total)',26,'cut'],
-  [18,'Mar 8','Peak','6 easy · 10 with 7 mi at MP · 6 easy','19 easy',41],
-  [19,'Mar 15','Peak','6 easy · 9 with 6 × 1 km intervals · 6 easy','20 easy',41],
-  [20,'Mar 22','Peak','6 easy · 10 with 8 mi at MP · 7 easy','20, last 3 at MP',43],
-  [21,'Mar 29','Peak','Cutback: 5 easy · 6 with strides · 4 easy','Cottonwood Glen Park 12K (12 total)',27,'cut'],
-  [22,'Apr 5','Peak','6 easy · 11 with 9 mi at MP · 7 easy','20 easy',44],
-  [23,'Apr 12','Peak','Cutback: 5 easy · 5 with strides','Horsetooth Half (14.1 total)',24.1,'cut'],
-  [24,'Apr 19','Peak','5 easy · 9 with 6 mi at MP · 5 easy','16, middle 8 at MP',35],
-  [25,'Apr 26','Taper','5 easy · 8 with 6 mi at MP · 5 easy','14 easy',32],
-  [26,'May 3','Taper','4 easy · 7 with 4 mi at MP · 4 easy','10 easy',25],
+  [14,'Feb 8','Build','4 easy · 7 with 4 mi at MP · 4 easy · 3 with strides','15 easy, rolling hills',33],
+  [15,'Feb 15','Build','5 easy · 8 with 3 × 2 mi tempo · 4 easy · 3 with strides','16 easy, rolling hills',36],
+  [16,'Feb 22','Build','5 easy · 9 with 6 mi at MP · 4 easy · 4 with strides','17 easy, rolling hills',39],
+  [17,'Mar 1','Build','Cutback: 4 easy · 5 with strides · 4 easy · 3 easy','Lee Martinez Park 10K (12 total)',28,'cut'],
+  [18,'Mar 8','Peak','6 easy · 7 with 3 mi tempo · 5 easy · 5 with strides','18, last 5 at MP',41],
+  [19,'Mar 15','Peak','6 easy · 9 with 6 × 1 km intervals · 5 easy · 5 with strides','20 easy, rolling hills',45],
+  [20,'Mar 22','Peak','6 easy · 10 with 8 mi at MP · 6 easy · 5 with strides','18 easy, rolling hills',45],
+  [21,'Mar 29','Peak','Cutback: 5 easy · 6 with strides · 5 easy · 4 easy','Cottonwood Glen Park 12K (12 total)',32,'cut'],
+  [22,'Apr 5','Peak','7 easy · 8 with 3 mi tempo · 7 easy · 6 with strides','20, last 6 at MP',48],
+  [23,'Apr 12','Peak','Cutback: 5 easy · 6 with 2 mi at MP · 4 easy · 3 with strides','Horsetooth Half (14.1 total)',32.1,'cut'],
+  [24,'Apr 19','Peak','4 easy · 5 easy · 6 with strides · 5 easy','18, middle 8 at MP',38],
+  [25,'Apr 26','Taper','5 easy · 8 with 5 mi at MP · 5 easy · 4 with strides','14 easy',36],
+  [26,'May 3','Taper','4 easy · 7 with 4 mi at MP · 4 easy · 3 with strides','10 easy',28],
   [27,'May 10','Taper','Mon 4 easy · Wed 4 with 2 mi at MP · Fri 3 with strides','Race day, Sun May 16',37.2,'race']
 ];
 const phaseNotes = {
@@ -280,13 +276,14 @@ function describe(raw, isLong) {
   if ((m = t.match(/last (\d+) at MP/))) return { day, type: 'Long run, MP finish', dist, detail: `Easy at ${PACE.easy}, then the last ${m[1]} mi at ${PACE.mp}.${fuel(dist)}` };
   if ((m = t.match(/middle (\d+) at MP/))) return { day, type: 'Long run, MP middle', dist, detail: `2–3 mi easy · ${m[1]} mi at ${PACE.mp} · easy to finish.${fuel(dist)}` };
   if ((m = t.match(/(\d+) mi at MP/))) return { day, type: 'Marathon pace', dist, detail: `1 mi warm-up · ${m[1]} mi at ${PACE.mp} · cool down` };
+  if (/rolling/.test(t)) return { day, type: 'Long run, rolling hills', dist, detail: `Easy effort on a hilly route with real downhills; stay relaxed descending, as at Horsetooth.${fuel(dist)}` };
   if (/strides/.test(t)) return { day, type: 'Easy + strides', dist, detail: `Easy at ${PACE.easy}, then 4 × 20 s strides with a walk back` };
   return { day, type: isLong ? 'Long run' : 'Easy', dist, detail: `Easy at ${PACE.easy}.${isLong ? fuel(dist) : ''}` };
 }
 function runsFor(r) {
   const [, , , weekday, long] = r;
   const parts = weekday.split(' · ');
-  const days = parts.length === 3 ? ['Tue', 'Thu', 'Fri'] : ['Tue', 'Thu'];
+  const days = parts.length === 4 ? ['Tue', 'Wed', 'Thu', 'Fri'] : parts.length === 3 ? ['Tue', 'Thu', 'Fri'] : ['Tue', 'Thu'];
   const runs = parts.map((p, i) => { const d = describe(p, false); d.day = d.day || days[i]; return d; });
   const l = describe(long, true);
   l.day = l.day || 'Sun';
@@ -298,9 +295,11 @@ function focusFor(r, runs) {
   const race = runs.find(x => x.race);
   if (race) return `<span class="race-tag">Race</span>${race.type}${race.day === 'Thu' ? ' (Thu)' : ''}`;
   if (r[6] === 'cut') return 'Cutback week';
-  const key = runs.slice(0, -1).find(x => !/^Easy/.test(x.type));
   const phrase = r[3].split(' · ').find(p => /tempo|intervals|MP/.test(p));
-  return key && phrase ? phrase.replace(/^\d+ with /, '') : 'Easy base';
+  const mid = phrase ? phrase.replace(/^\d+ with /, '') : '';
+  const mpLong = /at MP/.test(r[4]) ? 'MP long run' : '';
+  if (!mid && !mpLong) return r[0] > 9 ? 'Recovery week' : 'Easy base';
+  return [mid, mpLong].filter(Boolean).join(' + ');
 }
 const pct = (a, b) => (a - b) / b * 100;
 const fmt = v => `${v > 0 ? '+' : v < 0 ? '−' : '±'}${Math.abs(v).toFixed(1)}%`;
@@ -314,7 +313,7 @@ weeks.forEach((r, i) => {
   if (phase !== lastPhase) {
     const pr = document.createElement('tr');
     pr.className = 'phase-row';
-    pr.innerHTML = `<td colspan="8">${phaseNotes[phase]}</td>`;
+    pr.innerHTML = `<td colspan="7">${phaseNotes[phase]}</td>`;
     tbody.appendChild(pr);
     lastPhase = phase;
   }
@@ -328,7 +327,7 @@ weeks.forEach((r, i) => {
     let refJ = -1;
     for (let j = i - 1; j >= 0; j--) if (isRef(weeks[j])) { refJ = j; break; }
     let build = wow, sub = '';
-    if (refJ >= 0 && refJ !== i - 1 && mi > prev[5]) {
+    if (refJ >= 0 && refJ !== i - 1 && mi > prev[5] && mi > weeks[refJ][5]) {
       build = pct(mi, weeks[refJ][5]);
       sub = `vs wk ${weeks[refJ][0]}: ${fmt(build)}`;
     }
@@ -347,16 +346,16 @@ weeks.forEach((r, i) => {
   if (done[wk]) tr.classList.add('checked');
   tr.innerHTML = `<td><input type="checkbox" aria-label="Week ${wk} done" ${done[wk] ? 'checked' : ''}></td>
     <td class="num"><button class="toggle" aria-expanded="false" aria-label="Show week ${wk} runs"><span class="chev">›</span>${wk}</button></td>
-    <td class="num">${start}</td><td>${focusFor(r, runs)}</td><td>${long}</td><td class="num">${mi}</td><td class="num actual" data-wk="${wk}"><span class="muted">–</span></td><td class="num change">${change}</td>`;
+    <td class="num">${start}</td><td>${focusFor(r, runs)}</td><td>${long}</td><td class="num">${mi}</td><td class="num change">${change}</td>`;
 
   const dr = document.createElement('tr');
   dr.className = 'detail';
   dr.hidden = true;
-  dr.innerHTML = `<td colspan="8"><div class="runs">
+  dr.innerHTML = `<td colspan="7"><div class="runs">
     <div class="run head"><span>Day</span><span>Run</span><span>Miles</span><span>How</span></div>
     ${runs.map(x => `<div class="run"><span class="day">${x.day}</span><span class="type">${x.type}</span><span class="num">${x.dist}</span><span class="how">${x.detail}</span></div>`).join('')}
-    <div class="run total"><span></span><span>Week total</span><span class="num">${mi}</span><span class="how">${flag === 'race' ? 'Includes the 26.2-mile race' : 'Days are suggestions; keep the workout and long run 2+ days apart'}</span></div>
-  </div><div class="logged" data-wk="${wk}"></div></td>`;
+    <div class="run total"><span></span><span>Week total</span><span class="num">${mi}</span><span class="how">${flag === 'race' ? 'Includes the 26.2-mile race' : 'Days are suggestions; keep hard days 2+ days apart. Plus strength 2 × 20 min.'}</span></div>
+  </div></td>`;
 
   const btn = tr.querySelector('.toggle');
   const setOpen = open => { dr.hidden = !open; btn.setAttribute('aria-expanded', open); tr.classList.toggle('open', open); };
@@ -400,9 +399,11 @@ const c = name => css.getPropertyValue(name).trim();
   el('text', { x: left - 8, y: y(g) + 4, 'text-anchor': 'end', 'font-size': 12, fill: c('--muted') }, g);
 });
 el('line', { x1: left, x2: left + w, y1: base, y2: base, stroke: c('--muted') });
-const sw = weeks.findIndex(r => r[0] === 9);
-el('line', { x1: x(sw), x2: x(sw), y1: y0 - 10, y2: base, stroke: c('--muted'), 'stroke-dasharray': '4 3' });
-el('text', { x: x(sw) + 6, y: y0, 'font-size': 12, fill: c('--muted') }, '4 runs a week from Jan 4');
+[[9, '4 days/wk'], [14, '5 days/wk']].forEach(([wkN, label]) => {
+  const sw = weeks.findIndex(r => r[0] === wkN);
+  el('line', { x1: x(sw), x2: x(sw), y1: y0 - 10, y2: base, stroke: c('--muted'), 'stroke-dasharray': '4 3' });
+  el('text', { x: x(sw) + 5, y: y0, 'font-size': 12, fill: c('--muted') }, label);
+});
 weeks.forEach((r, i) => {
   const [wk, , , , , mi, flag] = r;
   const hi = flag !== 'race' && mi === peak;
@@ -428,89 +429,6 @@ weeks.forEach((r, i) => {
     start = i + 1;
   }
 });
-// Actual runs from Garmin: data/runs.json is updated by a GitHub Action
-// (.github/workflows/sync-garmin.yml). If the file isn't there yet, the page
-// just shows the plan.
-const DAY = 86400000;
-const PLAN_START_UTC = Date.UTC(2026, 10, 9);
-const weekOf = iso => { const [y, m, d] = iso.split('-').map(Number); return Math.floor((Date.UTC(y, m - 1, d) - PLAN_START_UTC) / (7 * DAY)) + 1; };
-const todayIso = (() => { const t = new Date(); return `${t.getFullYear()}-${String(t.getMonth() + 1).padStart(2, '0')}-${String(t.getDate()).padStart(2, '0')}`; })();
-const mmss = s => { s = Math.round(s); return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`; };
-const hms = s => { s = Math.round(s); const h = Math.floor(s / 3600); return h ? `${h}:${String(Math.floor(s % 3600 / 60)).padStart(2, '0')}:${String(s % 60).padStart(2, '0')}` : mmss(s); };
-const runDay = iso => { const [y, m, d] = iso.split('-').map(Number); return new Date(y, m - 1, d).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' }); };
-const typeLabel = t => ({ running: 'Run', street_running: 'Run', treadmill_running: 'Treadmill', indoor_running: 'Indoor run', trail_running: 'Trail run', track_running: 'Track', virtual_run: 'Virtual run' }[t] || 'Run');
-const fmtMi = v => (Math.round(v * 10) / 10).toFixed(1);
-
-fetch('data/runs.json', { cache: 'no-cache' })
-  .then(r => (r.ok ? r.json() : null))
-  .then(data => { if (data && Array.isArray(data.runs)) showActual(data); })
-  .catch(() => {});
-
-function showActual(data) {
-  const current = weekOf(todayIso);
-  const byWeek = {};
-  data.runs.forEach(r => {
-    const wk = weekOf(r.date);
-    (byWeek[wk] = byWeek[wk] || { mi: 0, runs: [] });
-    byWeek[wk].mi += r.mi;
-    byWeek[wk].runs.push(r);
-  });
-  const planFor = wk => (weeks.find(w => w[0] === wk) || [])[5] || 0;
-
-  // Actual column
-  document.querySelectorAll('td.actual').forEach(td => {
-    const wk = +td.dataset.wk;
-    if (wk > current) return;
-    const mi = byWeek[wk] ? byWeek[wk].mi : 0;
-    if (wk === current) {
-      td.innerHTML = `${fmtMi(mi)}<span class="sofar">so far</span>`;
-    } else {
-      const ok = mi >= planFor(wk) * 0.9;
-      td.innerHTML = `<span class="${ok ? 'good' : 'short'}">${fmtMi(mi)}</span>`;
-    }
-  });
-
-  // Logged runs inside each week's details
-  document.querySelectorAll('.logged').forEach(div => {
-    const wk = +div.dataset.wk;
-    if (wk > current) return;
-    const w = byWeek[wk];
-    if (!w) { div.innerHTML = '<h4>Logged on Garmin</h4><p class="none">No runs logged this week yet.</p>'; return; }
-    div.innerHTML = `<h4>Logged on Garmin</h4><div class="runs">
-      <div class="run head"><span>Day</span><span>Run</span><span>Miles</span><span>Time · pace</span></div>
-      ${w.runs.map(r => `<div class="run"><span class="day">${runDay(r.date).split(',')[0]}</span><span class="type">${typeLabel(r.type)}</span><span class="num">${fmtMi(r.mi)}</span><span class="how">${r.sec ? `${hms(r.sec)} · ${mmss(r.sec / r.mi)}/mi` : ''}</span></div>`).join('')}
-      <div class="run total"><span></span><span>Logged total</span><span class="num">${fmtMi(w.mi)}</span><span class="how">of ${planFor(wk)} planned</span></div>
-    </div>`;
-  });
-
-  // Chart: green bars for actual miles
-  weeks.forEach((r, i) => {
-    const wk = r[0];
-    if (wk > current || !byWeek[wk]) return;
-    const mi = Math.min(byWeek[wk].mi, max);
-    const bar = el('rect', { x: x(i) + band * 0.32, y: y(mi), width: band * 0.36, height: base - y(mi), rx: 2, fill: c('--actual') });
-    const t = document.createElementNS(NS, 'title');
-    t.textContent = `Week ${wk}: ${fmtMi(byWeek[wk].mi)} mi run of ${r[5]} planned`;
-    bar.appendChild(t);
-  });
-  document.getElementById('actualKey').hidden = false;
-
-  // Progress summary
-  const inPlan = current >= 1 && current <= weeks.length;
-  const thisWeek = byWeek[current] ? byWeek[current].mi : 0;
-  let plannedToDate = 0, runToDate = 0;
-  weeks.forEach(w => { if (w[0] <= current) plannedToDate += w[5]; });
-  Object.keys(byWeek).forEach(k => { if (+k >= 1 && +k <= current) runToDate += byWeek[k].mi; });
-  const last = data.runs[data.runs.length - 1];
-  const updated = data.updated ? new Date(data.updated).toLocaleString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' }) : '';
-  const box = document.getElementById('progress');
-  box.innerHTML = (inPlan ? `<div class="stat"><b>${fmtMi(thisWeek)} mi</b><span>this week, of ${planFor(current)} planned (week ${current})</span></div>` : '') +
-    `<div class="stat"><b>${fmtMi(runToDate)} mi</b><span>run since Nov 9, of ${Math.round(plannedToDate * 10) / 10} planned through this week</span></div>` +
-    `<div class="stat"><b>${data.runs.length}</b><span>runs logged</span></div>` +
-    (last ? `<div class="stat"><b>${fmtMi(last.mi)} mi</b><span>last run, ${runDay(last.date)}${last.sec ? ` · ${mmss(last.sec / last.mi)}/mi` : ''}</span></div>` : '') +
-    `<p class="note progress-note">From Garmin${updated ? `, updated ${updated}` : ''}. Syncs twice a day.</p>`;
-  box.hidden = false;
-}
 </script>
 </body>
 </html>
