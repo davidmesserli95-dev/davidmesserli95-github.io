@@ -88,7 +88,7 @@
   :root { --actual: #2f9e57; --short: #c2691e; }
   @media (prefers-color-scheme: dark) { :root { --actual: #5cc38a; --short: #e3944f; } }
   .home { display: inline-block; margin-bottom: 20px; color: var(--muted); text-decoration: none; font-size: 0.9rem; }
-  .progress { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin: -8px 0 24px; }
+  .progress { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin: 0 0 12px; }
   .progress .stat b { color: var(--actual); }
   .progress-note { grid-column: 1 / -1; margin: -4px 0 0; }
   td.actual .good { color: var(--actual); font-weight: 600; }
@@ -100,6 +100,20 @@
   .logged .none { font-size: 0.88rem; color: var(--muted); margin: 0; }
   .km { display: block; font-size: 0.75rem; color: var(--muted); font-weight: 400; }
   .run .kmc { color: var(--muted); font-weight: 400; }
+  /* This week + gauge */
+  .wk-top h2 { margin-top: 28px; }
+  .wk-top .runs { background: var(--surface); }
+  .wk-top .sub { margin: -6px 0 12px; }
+  .run.today { background: var(--accent-soft); }
+  .run.today .day::after { content: " ·today"; font-size: 0.7rem; color: var(--accent); font-weight: 600; }
+  .week-block { display: grid; grid-template-columns: 240px 1fr; gap: 12px; margin-bottom: 12px; }
+  .gauge-card { text-align: center; padding: 12px; }
+  .gauge-card svg { max-width: 210px; display: block; margin: 0 auto; }
+  .gauge-card h3 { margin: 0 0 4px; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.04em; color: var(--muted); font-weight: 600; }
+  .week-stats { display: grid; grid-template-rows: 1fr 1fr; gap: 12px; }
+  .week-stats .stat { display: flex; flex-direction: column; justify-content: center; padding: 10px 16px; }
+  .week-stats .stat b { color: var(--actual); }
+  @media (max-width: 520px) { .week-block { grid-template-columns: 1fr; } }
   .key { display: inline-block; width: 10px; height: 10px; border-radius: 2px; vertical-align: 0; margin: 0 4px 0 2px; }
 </style>
 </head>
@@ -109,6 +123,26 @@
   <h1>Sub-3:30 Marathon Plan</h1>
   <p class="meta">Race day: Sunday, May 16, 2027 · 27 weeks from November 9, 2026</p>
 
+  <section id="thisWeek" class="wk-top" hidden></section>
+  <section id="nextWeek" class="wk-top" hidden></section>
+
+
+  <h2>Weekly mileage</h2>
+  <div id="weekBlock" class="week-block" hidden>
+    <div class="card gauge-card">
+      <h3 id="gaugeTitle">This week</h3>
+      <svg id="gauge" viewBox="0 0 210 150" role="img" width="100%"></svg>
+    </div>
+    <div class="week-stats">
+      <div class="stat"><b id="weekTime">–</b><span>time trained this week</span></div>
+      <div class="stat"><b id="weekRuns">–</b><span>runs logged this week</span></div>
+    </div>
+  </div>
+  <div id="progress" class="progress" hidden></div>
+  <div class="card"><svg id="chart" viewBox="0 0 760 340" role="img" aria-label="Weekly running miles build to a 48-mile peak" width="100%"></svg></div>
+  <p class="note">Blue bars are peak weeks, lighter bars are cutback weeks, and dots mark race weeks. Week 27 includes the race. On the gauge, the arc and needle are miles run this week and the tick is the week's plan.<span id="actualKey" hidden> <span class="key" style="background: var(--actual)"></span>Green bars are miles actually run, from Garmin.</span></p>
+
+  <h2>Plan summary</h2>
   <p class="lead">Three easy runs a week through January 3 build your aerobic base. From January 4 you move to four runs a week with workouts, and from February 8 to five, peaking at 48 miles (77 km) in April. Seven races along the way double as tune-ups, and the Horsetooth Half on April 18 is the final checkpoint. Sub-3:30 means averaging 8:00 per mile (4:58 per km).</p>
 
   <div class="stats">
@@ -117,11 +151,6 @@
     <div class="stat"><b>2 × 20</b><span>20-milers (32 km), plus three 18s (29 km)</span></div>
     <div class="stat"><b>~1:42</b><span>Horsetooth Half checkpoint</span></div>
   </div>
-  <div id="progress" class="progress" hidden></div>
-
-  <h2>Weekly mileage</h2>
-  <div class="card"><svg id="chart" viewBox="0 0 760 340" role="img" aria-label="Weekly running miles build to a 48-mile peak" width="100%"></svg></div>
-  <p class="note">Blue bars are peak weeks, lighter bars are cutback weeks, and dots mark race weeks. Week 27 includes the race.<span id="actualKey" hidden> <span class="key" style="background: var(--actual)"></span>Green bars are miles actually run, from Garmin.</span></p>
 
   <h2>The weekly pattern</h2>
   <ul>
@@ -471,6 +500,74 @@ const runDay = iso => { const [y, m, d] = iso.split('-').map(Number); return new
 const typeLabel = t => ({ running: 'Run', street_running: 'Run', treadmill_running: 'Treadmill', indoor_running: 'Indoor run', trail_running: 'Trail run', track_running: 'Track', virtual_run: 'Virtual run' }[t] || 'Run');
 const fmtMi = v => (Math.round(v * 10) / 10).toFixed(1);
 
+// This week's and next week's schedule at the top of the page
+const currentWeek = weekOf(todayIso);
+function showWeek(id, label, wkN, isCurrent) {
+  const r = weeks.find(w => w[0] === wkN);
+  if (!r) return;
+  const runs = runsFor(r);
+  const today = isCurrent ? ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][new Date().getDay()] : '';
+  const d = n => new Date(PLAN_START_UTC + ((wkN - 1) * 7 + n) * DAY).toLocaleDateString('en-US', { month: 'short', day: 'numeric', timeZone: 'UTC' });
+  const todayRun = runs.find(x => x.day === today);
+  const todayNote = isCurrent ? ` · Today: ${todayRun ? `${todayRun.type}, ${todayRun.dist} mi (${toKm(todayRun.dist)} km)` : 'rest, cross-training or strength'}` : '';
+  const box = document.getElementById(id);
+  box.innerHTML = `<h2>${label} · week ${wkN} of ${weeks.length}</h2>
+    <p class="note sub">${d(0)} – ${d(6)} · ${r[2]} phase · ${focusFor(r, runs)}${todayNote}</p>
+    <div class="runs">
+      <div class="run head"><span>Day</span><span>Run</span><span>Miles</span><span>Km</span><span>How</span></div>
+      ${runs.map(x => `<div class="run${x.day === today ? ' today' : ''}"><span class="day">${x.day}</span><span class="type">${x.type}</span><span class="num">${x.dist}</span><span class="num kmc">${toKm(x.dist)}</span><span class="how">${x.detail}</span></div>`).join('')}
+      <div class="run total"><span></span><span>Week total</span><span class="num">${r[5]}</span><span class="num kmc">${toKm(r[5])}</span><span class="how">${r[6] === 'race' ? 'Includes the 26.2-mile race' : 'Days are suggestions; keep hard days 2+ days apart. Plus strength 2 × 20 min.'}</span></div>
+    </div>${isCurrent ? `<div class="logged" data-wk="${wkN}"></div>` : ''}`;
+  box.hidden = false;
+}
+showWeek('thisWeek', 'This week', currentWeek, true);
+showWeek('nextWeek', 'Next week', currentWeek + 1, false);
+
+// Gauge: miles run this week against the week's plan
+const hm = sec => { const m = Math.round(sec / 60); return `${Math.floor(m / 60)}h ${String(m % 60).padStart(2, '0')}m`; };
+function drawGauge(logged, goal) {
+  const actual = logged == null ? 0 : logged;
+  const g = document.getElementById('gauge');
+  g.textContent = '';
+  const add = (tag, attrs, text) => {
+    const n = document.createElementNS(NS, tag);
+    for (const k in attrs) n.setAttribute(k, attrs[k]);
+    if (text !== undefined) n.textContent = text;
+    g.appendChild(n);
+    return n;
+  };
+  const cx = 105, cy = 88, R = 68, W = 14;
+  const scaleMax = Math.max(goal * 1.25, actual);           // goal sits at 80% unless you run past the dial
+  const pt = (f, rad) => { const a = Math.PI * (1 - f); return [cx + rad * Math.cos(a), cy - rad * Math.sin(a)]; };
+  const arc = f => { const [x1, y1] = pt(0, R), [x2, y2] = pt(f, R); return `M${x1} ${y1.toFixed(2)} A${R} ${R} 0 0 1 ${x2.toFixed(2)} ${y2.toFixed(2)}`; };
+  const f = Math.min(actual / scaleMax, 1), fg = goal / scaleMax;
+  const pctOfGoal = Math.round(actual / goal * 100);
+  g.setAttribute('aria-label', logged == null ? `Week ${currentWeek}: ${goal} miles planned, no Garmin data loaded` : `Week ${currentWeek}: ${fmtMi(actual)} of ${goal} planned miles run, ${pctOfGoal}%`);
+  add('path', { d: arc(1), fill: 'none', stroke: c('--bar-light'), 'stroke-width': W });
+  if (f > 0.005) add('path', { d: arc(f), fill: 'none', stroke: c('--actual'), 'stroke-width': W });
+  // Goal tick and label
+  const [gx1, gy1] = pt(fg, R - W / 2 - 3), [gx2, gy2] = pt(fg, R + W / 2 + 4), [glx, gly] = pt(fg, R + W / 2 + 8);
+  add('line', { x1: gx1, y1: gy1, x2: gx2, y2: gy2, stroke: c('--text'), 'stroke-width': 2.5, 'stroke-linecap': 'round' });
+  add('text', { x: glx, y: gly + 2, 'font-size': 11, fill: c('--muted'), 'text-anchor': fg > 0.55 ? 'start' : 'middle' }, goal);
+  // Needle
+  const [nx, ny] = pt(f, R - W / 2 - 7);
+  add('line', { x1: cx, y1: cy, x2: nx, y2: ny, stroke: c('--text'), 'stroke-width': 2.5, 'stroke-linecap': 'round' });
+  add('circle', { cx, cy, r: 5, fill: c('--text') });
+  // Scale ends
+  add('text', { x: cx - R, y: cy + 15, 'text-anchor': 'middle', 'font-size': 11, fill: c('--muted') }, '0');
+  add('text', { x: cx + R, y: cy + 15, 'text-anchor': 'middle', 'font-size': 11, fill: c('--muted') }, Math.round(scaleMax * 10) / 10);
+  // Readout
+  add('text', { x: cx, y: cy + 36, 'text-anchor': 'middle', 'font-size': 21, 'font-weight': 700, fill: c('--text') }, logged == null ? '– mi' : `${fmtMi(actual)} mi`);
+  add('text', { x: cx, y: cy + 53, 'text-anchor': 'middle', 'font-size': 11.5, fill: c('--muted') },
+    logged == null ? `of ${goal} mi (${toKm(goal)} km) planned` : `${toKm(actual)} km · ${pctOfGoal}% of ${goal} mi planned`);
+  const t = document.createElementNS(NS, 'title');
+  t.textContent = logged == null ? `${goal} mi planned; no Garmin data loaded` : `${fmtMi(actual)} mi (${toKm(actual)} km) run of ${goal} mi (${toKm(goal)} km) planned, ${pctOfGoal}%`;
+  g.appendChild(t);
+  document.getElementById('gaugeTitle').textContent = `Week ${currentWeek} mileage`;
+  document.getElementById('weekBlock').hidden = false;
+}
+{ const w = weeks.find(w => w[0] === currentWeek); if (w) drawGauge(null, w[5]); }
+
 fetch('data/runs.json', { cache: 'no-cache' })
   .then(r => (r.ok ? r.json() : null))
   .then(data => { if (data && Array.isArray(data.runs)) showActual(data); })
@@ -525,23 +622,28 @@ function showActual(data) {
   });
   document.getElementById('actualKey').hidden = false;
 
-  // Progress summary
+  // This-week boxes beside the gauge, then totals since the plan started
   const inPlan = current >= 1 && current <= weeks.length;
-  const thisWeek = byWeek[current] ? byWeek[current].mi : 0;
-  let plannedToDate = 0, runToDate = 0, secToDate = 0;
+  const cur = byWeek[current] || { mi: 0, runs: [] };
+  if (inPlan) {
+    drawGauge(cur.mi, planFor(current));
+    document.getElementById('weekTime').textContent = hm(cur.runs.reduce((t, r) => t + (r.sec || 0), 0));
+    document.getElementById('weekRuns').textContent = cur.runs.length;
+  }
+  let plannedToDate = 0, runToDate = 0, secToDate = 0, runsToDate = 0;
   weeks.forEach(w => { if (w[0] <= current) plannedToDate += w[5]; });
-  Object.keys(byWeek).forEach(k => { if (+k >= 1 && +k <= current) { runToDate += byWeek[k].mi; byWeek[k].runs.forEach(r => { secToDate += r.sec || 0; }); } });
-  const totalMin = Math.round(secToDate / 60);
-  const hoursTrained = `${Math.floor(totalMin / 60)}h ${String(totalMin % 60).padStart(2, '0')}m`;
-  const last = data.runs[data.runs.length - 1];
+  Object.keys(byWeek).forEach(k => {
+    if (+k < 1 || +k > current) return;
+    runToDate += byWeek[k].mi;
+    runsToDate += byWeek[k].runs.length;
+    byWeek[k].runs.forEach(r => { secToDate += r.sec || 0; });
+  });
   const updated = data.updated ? new Date(data.updated).toLocaleString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' }) : '';
   const box = document.getElementById('progress');
   box.innerHTML =
-    `<div class="stat"><b>${fmtMi(runToDate)} mi</b><span>total trained · ${toKm(runToDate)} km · of ${Math.round(plannedToDate * 10) / 10} mi planned through this week</span></div>` +
-    `<div class="stat"><b>${hoursTrained}</b><span>total time trained since Nov 9</span></div>` +
-    (inPlan ? `<div class="stat"><b>${fmtMi(thisWeek)} mi</b><span>this week · ${toKm(thisWeek)} km · of ${planFor(current)} mi planned (week ${current})</span></div>` : '') +
-    `<div class="stat"><b>${data.runs.length}</b><span>runs logged</span></div>` +
-    (last ? `<div class="stat"><b>${fmtMi(last.mi)} mi</b><span>last run · ${toKm(last.mi)} km · ${runDay(last.date)}${last.sec ? ` · ${mmss(last.sec / last.mi)}/mi · ${mmss(last.sec / last.mi / KM_PER_MI)}/km` : ''}</span></div>` : '') +
+    `<div class="stat"><b>${fmtMi(runToDate)} mi</b><span>total miles · ${toKm(runToDate)} km · of ${Math.round(plannedToDate * 10) / 10} mi planned through this week</span></div>` +
+    `<div class="stat"><b>${hm(secToDate)}</b><span>total time trained since Nov 9</span></div>` +
+    `<div class="stat"><b>${runsToDate}</b><span>total runs logged since Nov 9</span></div>` +
     `<p class="note progress-note">From Garmin${updated ? `, last new run synced ${updated}` : ''}. Checks twice a day.</p>`;
   box.hidden = false;
 }
